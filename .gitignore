@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# other stuff: no data and no results, no out or html files
+data/*
+results/*
+*.html
+*.out
+SourceFile.R
+MR_GLP1R.Rproj
