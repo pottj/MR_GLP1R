@@ -10,3 +10,4 @@
 
 - created github repository
 - added some example scripts for data harmonization, top-list creation and colocalization
+- Test 
