@@ -10,4 +10,8 @@
 
 - created github repository
 - added some example scripts for data harmonization, top-list creation and colocalization
-- Test 
+
+
+## 18/08/2025
+- running script so far
+- downloading dataset 

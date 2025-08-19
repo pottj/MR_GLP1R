@@ -24,7 +24,16 @@
 rm(list = ls())
 time0<-Sys.time()
 
-source("../SourceFile.R")
+# GWAS summary statistics for BMI
+
+Pulit_BMI_female = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.females.23May2018.txt"
+Pulit_BMI_male = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.males.23May2018.txt"
+Pulit_BMI_combined = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt"
+
+# GWAS summary statistics for PCOS
+
+Venkatesh_PCOS = "/Users/harshikamohanraj/Downloads/GCST90483500.h.tsv"
+
 
 #' # Load data ####
 #' ***
@@ -96,7 +105,6 @@ stopifnot(BMI_comb$rsID == BMI_mal$rsid)
 #' # Harmonize alleles ####
 #' ***
 #' At the moment, the SNPs are just the same rsIDs. But I want the same effect allele throughout. 
-#'  
 table(BMI_comb$Tested_Allele == BMI_fem$Tested_Allele,
       BMI_comb$Other_Allele == BMI_fem$Other_Allele)
 table(BMI_comb$Tested_Allele == BMI_mal$Tested_Allele,

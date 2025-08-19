@@ -21,6 +21,129 @@
 #' 
 #' # Initialize ####
 #' ***
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(ivreg, meta, MendelianRandomization)
+
+rm(list=ls()) #Remove any existing objects in R 
+pacman::p_load("car")
+library(car)
+attach(Prestige) #Attach Prestige to the R search path 
+help(Prestige) #Description of the dataset 
+str(Prestige) #Info on the structure of the data 
+head(Prestige) #Show first 6 entries 
+plot(education, income)
+model<-lm(income ~ education)
+summary(model)
+edu_income = summary(model) #Store results from the regression model 
+slope = edu_income$coef[2] #Estimate of the slope parameter  
+slope 
+slope_se = edu_income$coef[2,2] #Standard error of the slope parameter  
+slope_se
+f_stat = edu_income$f[1] #F-statistic 
+f_stat 
+PredictedValues<- predict(model) # the fitted values for the model data
+cbind(Actual = income[1:5], Fitted= model$fitted.values[1:5],  Predicted= PredictedValues[1:5])
+new <- data.frame(education = seq(5, 15, 2)) #predicted values for a new data set
+PredictedValues2<- predict(model, newdata=new, se.fit = TRUE)
+cbind(Education=new, PredictedIncome=PredictedValues2$fit, SE= PredictedValues2$se.fit)
+plot(education, income)
+abline(model, col="red")
+summary(lm(income ~ education-1))
+
+
+rm(list=ls()) #Remove any existing objects in R 
+#setwd("C:/Users/Amy/Documents/MR_practicals/MR-Course2") #Change to your downloaded files location
+coursedata = read.csv("/Users/harshikamohanraj/Downloads/coursedata.csv") #Load data
+ratio.all = read.csv("/Users/harshikamohanraj/Downloads/summarized_data.csv", row=1) # Load answer data for later
+attach(coursedata) #Attach coursedata to the R search path 
+str(coursedata) #Info on the structure of the data 
+head(coursedata) #Show first 6 entries 
+#casual estimate using the ratio method for a continuous outcome 
+#x=risk factor, y=continuous outcome 
+#calculate the ratio causal estimate for the first genetic variant g1
+by1 = lm(y~g1)$coef[2] #Genetic association with the outcome
+bx1 = lm(x~g1)$coef[2] #Genetic association with the exposure
+beta.ratio1 = by1/bx1  
+beta.ratio1 #Ratio estimate for g1 
+#The standard error of the causal estimate = SE of genetic association with the outcome/genetic association with the risk factor 
+byse1 = summary(lm(y~g1))$coef[2,2] #Standard error of the G-Y association
+se.ratio1first = byse1/sqrt(bx1^2)  
+se.ratio1first #Standard error (first order) of the ratio estimate 
+#above approximation does not account for the uncertainty in the denominator of the ratio estimate
+bxse1 = summary(lm(x~g1))$coef[2,2] #Standard error of the G-X association
+se.ratio1second = sqrt(byse1^2/bx1^2 + by1^2*bxse1^2/bx1^4)
+se.ratio1second #Standard error (second order) of the ratio estimate 
+# F-statistic from the regression of the risk factor on the genetic variant(s) is used as a measure of ‘weak instrument bias’
+fstat1 = summary(lm(x~g1))$f[1]
+fstat1 #Some studies recommend excluding genetic variants if they have a F-statistic less than 10
+#Minor Allele Frequency (MAF) is the frequency at which the second most common allele occurs in a given population
+#MAF for g1
+MAF = (sum(g1==1) + 2*sum(g1==2))/(2*length(g1))
+MAF
+ratio.all
+
+#observational association by regression y on x 
+lm(y~x)$coef[2]
+
+#two-stage least squares method “by hand”
+by.hand.fitted.values<-lm(x~g1+g2+g3+g4)$fitted
+by.hand<-lm(y~by.hand.fitted.values)
+summary(by.hand)$coef[2]  #estimate
+summary(by.hand)$coef[2,2] # standard error
+
+#Ivreg function for two stage least squares method 
+ivmodel.all = ivreg(y~x|g1+g2+g3+g4, x=TRUE)
+summary(ivmodel.all)$coef[2] #2SLS estimate 
+summary(ivmodel.all)$coef[2,2] #Standard error of the 2SLS estimate 
+#The estimates are the same, but the standard error is slightly larger using the ivreg function as it takes into account the uncertainty in the first stage regression.
+
+#F statistic
+summary(lm(x~g1+g2+g3+g4))$f[1]
+#the two-stage least squares method based only on the first genetic variant g1.
+ivmodel.g1 = ivreg(y~x|g1, x=TRUE)
+summary(ivmodel.g1)$coef[2] #2SLS estimate for g1 only 
+summary(ivmodel.g1)$coef[2,2] #Standard error of the 2SLS estimate for g1 only
+
+#Causal estimate for a binary outcome 
+#causal effect of the risk factor x on the binary outcome y.bin -> estimated as the per allel genetic association with the outcome divided  by the per allele genetic association with the risk factor 
+#with a binary outcome, logistic regression used for regression of the outcome on the genetic variant 
+#Evaluate the ratio estimate and its standard error for g1 using logistic regression
+by1.bin   = glm(y.bin~g1, family=binomial)$coef[2] #logistic regression for - numerator (gene-outcome association)
+#gene-outcome association
+byse1.bin = summary(glm(y.bin~g1, family=binomial))$coef[2,2]
+bx1.bin   = lm(x[y.bin==0]~g1[y.bin ==0])$coef[2] #linear regression in the controls only - denominator calculate 
+beta.ratio1.bin = by1.bin/bx1.bin
+beta.ratio1.bin #ratio estimate for g1
+se.ratio1.bin   = byse1.bin/bx1.bin
+se.ratio1.bin #standard error of the ratio estimate for g1
+
+#Calculate the two-stage least squares estimate for g1 only
+#first regress the risk factor on the genetic variant - regression only on the controls 
+#then, find fitted values for the model 
+g1.con = g1[y.bin ==0] #values for g1 in the controls only 
+x.con  = x[y.bin ==0] #values for the risk factor in the controls only 
+predict.con.g1 = predict(lm(x.con~g1.con), newdata=list(g1.con=g1)) #Generate predicted
+#values for all participants based on the linear regression in the controls only.  
+tsls1.con = glm(y.bin~predict.con.g1, family=binomial) #Fit a logistic regression 
+#model on all the participants
+summary(tsls1.con)$coef[2]
+summary(tsls1.con)$coef[2,2] 
+#two-stage least squares estimate for all of the genetic variants.
+g2.con = g2[y.bin ==0] #values for g2 in the controls only 
+g3.con = g3[y.bin ==0] #values for g3 in the controls only 
+g4.con = g4[y.bin ==0] #values for g4 in the controls only
+#Predicted values 
+predict.con<-predict(lm(x.con~g1.con+g2.con+g3.con+g4.con), newdata=c(list(g1.con=g1),list(g2.con=g2), list(g3.con=g3),list(g4.con=g4)))
+tsls1.con.all = glm(y.bin~predict.con, family=binomial) #Logistic regression
+summary(tsls1.con.all)$coef[2] #
+summary(tsls1.con.all)$coef[2,2] # represents the change in log causal odds ratio for y.bin per one unit increase in x.
+
+#cleanup workspace 
+detach(coursedata)
+rm(list=ls())
+
+
 rm(list = ls())
 time0<-Sys.time()
 

@@ -24,13 +24,13 @@ suppressPackageStartupMessages(library(WriteXLS))
 
 # GWAS summary statistics for BMI
 
-Pulit_BMI_female = "Path/to/2018_Pulit_GIANT/bmi.giant-ukbb.meta-analysis.females.23May2018.txt"
-Pulit_BMI_male = "Path/to/2018_Pulit_GIANT/bmi.giant-ukbb.meta-analysis.males.23May2018.txt"
-Pulit_BMI_combined = "Path/to/2018_Pulit_GIANT/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt"
+Pulit_BMI_female = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.females.23May2018.txt"
+Pulit_BMI_male = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.males.23May2018.txt"
+Pulit_BMI_combined = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt"
 
 # GWAS summary statistics for PCOS
 
-Venkatesh_PCOS = "Path/to/2025_Venkatesh_PCOS/GCST90483500.h.tsv.gz"
+Venkatesh_PCOS = "Users/harshikamohanraj/Downloads/CST90483500.h.tsv.gz"
 
 #############################
 # Helper function
