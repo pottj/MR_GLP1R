@@ -143,6 +143,134 @@ summary(tsls1.con.all)$coef[2,2] # represents the change in log causal odds rati
 detach(coursedata)
 rm(list=ls())
 
+rm(list=ls()) #Remove any existing objects in R 
+#setwd("C:/Users/Amy/Documents/MR_practicals/MR-Course2") #Change to your downloaded files location
+coursedata = read.csv("/Users/harshikamohanraj/Downloads/coursedata.csv") #Load data
+ratio.all = read.csv("/Users/harshikamohanraj/Downloads/summarized_data.csv", row=1) # Load answer data for later
+attach(coursedata) #Attach coursedata to the R search path 
+bx=ratio.all["bx",]
+by=ratio.all["by",]
+bxse=ratio.all["bxse",]
+byse=ratio.all["byse",]
+
+#Two-stage least squares and inverse-variance weighted estimates 
+beta.ivw = sum(bx*by*byse^-2)/sum(bx^2*byse^-2)
+beta.ivw #IVW estimate 
+se.ivw   = 1/sqrt(sum(bx^2*byse^-2))
+se.ivw #standard error of the IVW estimate 
+#estimate from the 2SLS method was 0.570785 with a standard error of 0.2291837, which is very similar to the estimates from the IVW approach.
+
+
+#Inverse variance weighted formula 
+#meta-analysis of the ratio estimates from the individual variants, using the first-order standard errors.
+#Calculate the ratio estimates and first-order standard errors for four genetic variants 
+beta.ratio.all =  t(by/bx) 
+se.ratio.all = t(byse/bx)
+#meta-analysis command - fixed-effect estimate and standard error using the metagen command is identical to the IVW estimate and standard error
+metagen(beta.ratio.all, se.ratio.all)
+metagen(beta.ratio.all, se.ratio.all)$TE.fixed
+metagen(beta.ratio.all, se.ratio.all)$seTE.fixed
+# IVW method can also be motivated as a ratio estimate using a weighted allele score as an instrumental variable
+score <- g1*as.numeric(bx[1]) + g2*as.numeric(bx[2]) + g3*as.numeric(bx[3]) + g4*as.numeric(bx[4])
+#Calculate the ratio estimate and its standard error (first-order) using this score as an instrumental variable
+ivmodel.score = ivreg(y~x|score, x=TRUE)
+summary(ivmodel.score)
+#fit the weighted linear regression model and obtain the causal estimate
+BY<-t(by) # rotates data to a column vector
+BX<-t(bx)
+BYSE<-t(byse)
+BXSE<-t(bxse)
+regression<- lm(BY~BX-1, weights = BYSE^-2)
+summary(regression) 
+summary(regression)$coef[1]   
+summary(regression)$coef[1,2]/summary(regression)$sigma 
+#standard error is divided by the sigma quantity in the final line of code 
+
+plot(BX, BY, xlim=c(min(BX-2*BXSE, 0), max(BX+2*BXSE, 0)),
+     ylim=c(min(BY-2*BYSE, 0), max(BY+2*BYSE, 0)))
+for (j in 1:length(BX)) {
+  lines(c(BX[j],BX[j]), c(BY[j]-1.96*BYSE[j], BY[j]+1.96*BYSE[j]))
+  lines(c(BX[j]-1.96*BXSE[j],BX[j]+1.96*BXSE[j]), c(BY[j], BY[j]))
+}
+abline(h=0, lwd=1); abline(v=0, lwd=1)
+# add IVW estimate
+abline(a=0, b=sum(bx*by*byseˆ(-2)/sum(bxˆ2*byseˆ(-2),col="red")
+
+#lines around each point ->lines represent the 95% confidence intervals for the genetic associations with the exposure and with the outcome
+detach(coursedata)
+rm(list=ls())
+
+#packages types - two sample MR = package from MR-Base automates the selection of SNPs and datasets 
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(MendelianRandomization)
+ratio.all <- as.matrix(read.csv("/Users/harshikamohanraj/Downloads/summarized_data.csv", row=1))# Load answer data for later
+coursedata = read.csv("/Users/harshikamohanraj/Downloads/coursedata.csv") #Load data
+attach(coursedata) #Attach coursedata to the R search path 
+bx.all=ratio.all["bx",]
+by.all=ratio.all["by",]
+bxse.all=ratio.all["bxse",]
+byse.all=ratio.all["byse",]
+
+#define a MRInput object to ensure the data is correctly formatted 
+MRObject = mr_input(bx = bx.all, bxse = bxse.all, by = by.all, byse = byse.all)
+#inverse-variance weighted (IVW) estimate
+mr_ivw(MRObject)
+
+#comparing fixed effects and random effects 
+diabetes_data = read.csv("/Users/harshikamohanraj/Downloads/diabetes_data.csv")
+detach(coursedata)
+attach(diabetes_data)
+MRObject2 = mr_input(bx = beta.exposure, bxse = se.exposure, 
+                     by = beta.outcome, byse = se.outcome,snps = SNP)
+mr_ivw(MRObject2, model="fixed")
+
+
+#Graphs for the Inverse-variance weighted method
+# scatter plot
+mr_plot(MRObject2)
+
+# single snp plot
+mr_forest(MRObject2, ordered=TRUE)
+
+# leave one out plot
+mr_loo(MRObject2)
+
+# funnel plot
+mr_funnel(MRObject2)
+     
+#MR Egger and median-based methods using MR 
+# creates mr_input objects
+MR_LDLObject = mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse)
+MR_HDLObject = mr_input(bx = hdlc, bxse = hdlcse, by = chdlodds, byse = chdloddsse)
+# fit some egger and median models
+mr_egger(MR_LDLObject)
+mr_median(MR_LDLObject, weighting="weighted")
+mr_median(MR_LDLObject, weighting="simple")
+# graph mr models
+mr_allmethods(MR_LDLObject)
+mr_allmethods(MR_LDLObject, method="main")
+
+
+# fit some egger and median models
+mr_egger(MR_HDLObject)
+mr_median(MR_HDLObject, weighting="weighted")
+mr_median(MR_HDLObject, weighting="simple")
+# graph mr models
+mr_allmethods(MR_HDLObject)
+mr_allmethods(MR_HDLObject, method="main")
+
+mr_plot(MR_LDLObject)
+mr_plot(MR_LDLObject, orientate=TRUE, line="egger")
+mr_plot(MR_LDLObject, interactive=FALSE)
+mr_plot(MR_LDLObject, interactive=FALSE, labels=TRUE)
+mr_plot(MR_HDLObject)
+mr_plot(MR_HDLObject, orientate=TRUE, line="egger")
+mr_plot(MR_HDLObject, interactive=FALSE)
+mr_plot(MR_HDLObject, interactive=FALSE, labels=TRUE)
+   
+
+#End of course
+
 
 rm(list = ls())
 time0<-Sys.time()

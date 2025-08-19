@@ -37,9 +37,9 @@ Venkatesh_PCOS = "/Users/harshikamohanraj/Downloads/GCST90483500.h.tsv"
 
 #' # Load data ####
 #' ***
-BMI_fem = fread(Pulit_BMI_female)
-BMI_mal = fread(Pulit_BMI_male)
-BMI_comb = fread(Pulit_BMI_combined)
+BMI_fem = fread( "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.females.23May2018.txt")
+BMI_mal = fread("/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.males.23May2018.txt")
+BMI_comb = fread("/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt")
 
 PCOS = fread(Venkatesh_PCOS)
 
@@ -51,6 +51,7 @@ PCOS = fread(Venkatesh_PCOS)
 #' - chr6:39,048,781-39,091,303 (GRCh38/hg38)
 #' 
 names(BMI_fem)
+
 BMI_fem = BMI_fem[CHR==6,]
 BMI_fem = BMI_fem[POS > 39016574 - 1e6,]
 BMI_fem = BMI_fem[POS < 39055519 + 1e6,]
