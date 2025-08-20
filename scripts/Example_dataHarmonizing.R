@@ -1,7 +1,7 @@
 #' ---
 #' title: "Example script for data harmonization"
 #' subtitle: ""
-#' author: "Janne Pott"
+#' author: "Janne Pott and Harshika Mohan Raj"
 #' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'   html_document:
@@ -41,7 +41,7 @@ BMI_fem = fread( "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis
 BMI_mal = fread("/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.males.23May2018.txt")
 BMI_comb = fread("/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt")
 
-PCOS = fread(Venkatesh_PCOS)
+PCOS = fread("/Users/harshikamohanraj/Downloads/PCOS_sumstats.tsv")
 
 #' # Filter data ####
 #' ***
@@ -51,7 +51,6 @@ PCOS = fread(Venkatesh_PCOS)
 #' - chr6:39,048,781-39,091,303 (GRCh38/hg38)
 #' 
 names(BMI_fem)
-
 BMI_fem = BMI_fem[CHR==6,]
 BMI_fem = BMI_fem[POS > 39016574 - 1e6,]
 BMI_fem = BMI_fem[POS < 39055519 + 1e6,]
@@ -82,10 +81,10 @@ BMI_fem[,rsID := gsub(":.*","",SNP)]
 BMI_mal[,rsID := gsub(":.*","",SNP)]
 BMI_comb[,rsID := gsub(":.*","",SNP)]
 
-PCOS = PCOS[rsid %in% BMI_fem$rsID & rsid %in% BMI_mal$rsID & rsid %in% BMI_comb$rsID,]
-BMI_fem = BMI_fem[rsID %in% PCOS$rsid, ]
-BMI_mal = BMI_mal[rsID %in% PCOS$rsid, ]
-BMI_comb = BMI_comb[rsID %in% PCOS$rsid, ]
+PCOS = PCOS[rs_id %in% BMI_fem$rsID & rs_id %in% BMI_mal$rsID & rs_id %in% BMI_comb$rsID,]
+BMI_fem = BMI_fem[rsID %in% PCOS$rs_id, ]
+BMI_mal = BMI_mal[rsID %in% PCOS$rs_id, ]
+BMI_comb = BMI_comb[rsID %in% PCOS$rs_id, ]
 
 # Check duplicates & triallelic SNPs
 BMI_fem[duplicated(SNP),]
@@ -93,7 +92,8 @@ BMI_fem[duplicated(rsID),]
 BMI_fem[duplicated(POS),]
 
 #' Check order of data sets
-stopifnot(BMI_comb$rsID == PCOS$rsid)
+setorder(PCOS,base_pair_location) #Alternative: match command - using id variable to order the other datasets 
+stopifnot(BMI_comb$rsID == PCOS$rs_id)
 stopifnot(BMI_comb$rsID == BMI_fem$rsid)
 stopifnot(BMI_comb$rsID == BMI_mal$rsid)
 
@@ -110,6 +110,8 @@ table(BMI_comb$Tested_Allele == BMI_fem$Tested_Allele,
       BMI_comb$Other_Allele == BMI_fem$Other_Allele)
 table(BMI_comb$Tested_Allele == BMI_mal$Tested_Allele,
       BMI_comb$Other_Allele == BMI_mal$Other_Allele)
+
+    #EA and OA -> renaming the columns 
 
 plot(BMI_fem$Freq_Tested_Allele, BMI_mal$Freq_Tested_Allele)
 plot(BMI_fem$Freq_Tested_Allele, BMI_comb$Freq_Tested_Allele)
@@ -147,7 +149,7 @@ BMI_fem = BMI_fem[!filt,]
 #' ***
 #' Save the harmonized data 
 #' 
-save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "../data/Input_harmonized.RData")
+save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_harmonized.RData")
 
 #' # Session Info ####
 #' ***

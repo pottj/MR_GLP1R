@@ -23,12 +23,8 @@
 #' ***
 rm(list = ls())
 time0<-Sys.time()
-
-source("../SourceFile.R")
-
 #' # Load data ####
 #' ***
-load("../data/Input_harmonized.RData")
 
 #' # Significant SNPs ####
 #' ***
@@ -90,9 +86,9 @@ BMI_fem[rsID %in% topList$rsID]
 BMI_comb = BMI_comb[rsID %in% topList$rsID]
 BMI_mal = BMI_mal[rsID %in% topList$rsID]
 BMI_fem = BMI_fem[rsID %in% topList$rsID]
-PCOS = PCOS[rsid %in% topList$rsID]
+PCOS = PCOS[rs_id %in% topList$rs_ID]
 
-save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "../data/Input_TopHitsPruned.RData")
+save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_TopHitsPruned.RData")
 
 #' # Session Info ####
 #' ***
