@@ -1,7 +1,7 @@
 #' ---
 #' title: "Example script for top SNP identification"
 #' subtitle: ""
-#' author: "Janne Pott"
+#' author: "Janne Pott and Harshika Mohan Raj"
 #' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'   html_document:
@@ -83,15 +83,35 @@ BMI_fem[rsID %in% topList$rsID]
 #' ***
 #' Save the harmonized data 
 #' 
-BMI_comb = BMI_comb[rsID %in% topList$rsID]
-BMI_mal = BMI_mal[rsID %in% topList$rsID]
-BMI_fem = BMI_fem[rsID %in% topList$rsID]
-PCOS = PCOS[rs_id %in% topList$rs_ID]
-
 save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_TopHitsPruned.RData")
+
+names(BMI_comb)
+# install.packages("remotes") # Run if remotes package not installed
+library(remotes)
+install_github("MRCIEU/TwoSampleMR")
+
+require(TwoSampleMR)
+#' MR analysis 
+BMI_fem
+
+read_exposure_data(
+  BMI_fem,
+  clump = FALSE,
+  snp_col = "SNP",
+  beta_col = "BETA",
+  se_col = "SE",
+  eaf_col = "Freq_Tested_Allele",
+  effect_allele_col = "Tested_Allele",
+  other_allele_col = "Other_allele",
+  pval_col = "P",
+  min_pval = 1e-200,
+  log_pval = FALSE,
+  chr_col = "CHR",
+)
 
 #' # Session Info ####
 #' ***
 sessionInfo()
 message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
+
 

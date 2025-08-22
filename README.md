@@ -27,13 +27,18 @@ Summer intern project - MR of GLP1R on female-specific outcomes (e.g. PCOS, meas
 
 To be updated, e.g.
 
-- **Exposure**: body mass index (BMI), lowered via GLP-1R activation
+- **Exposure 1**: body mass index (BMI), lowered via GLP-1R activation
 - **Publication**: Pulit SL, Stoneman C, Morris AP, et al. Meta-analysis of genome-wide association studies for body fat distribution in 694 649 individuals of European ancestry. Hum Mol Genet. 2019;28(1):166-174. doi:10.1093/hmg/ddy327
 - **Data**: downloaded from https://zenodo.org/records/1251813
 
 - **Outcome 1**: polycystic ovary syndrome (PCOS)
 - **Publication**: Venkatesh SS, Wittemans LBL, Palmer DS, et al. Genome-wide analyses identify 25 infertility loci and relationships with reproductive traits across the allele frequency spectrum. Nat Genet. 2025;57(5):1107-1118. doi:10.1038/s41588-025-02156-8
 - **Data**: downloaded from https://www.ebi.ac.uk/gwas/studies/GCST90483500
+
+
+- **Exposure 2**: Haemoglobin A1C (HbA1C), lowered by GLP-1R activation 
+- **Data**: downloaded from UK Biobank (Neale lab). http://www.nealelab.is/uk-biobank/.)
+
 
 ## Relevant questions
 

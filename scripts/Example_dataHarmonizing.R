@@ -1,7 +1,7 @@
 #' ---
 #' title: "Example script for data harmonization"
 #' subtitle: ""
-#' author: "Janne Pott and Harshika Mohan Raj"
+#' author: "Janne Pott and Harshika Mohan Raj (edits)"
 #' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'   html_document:
@@ -150,6 +150,8 @@ BMI_fem = BMI_fem[!filt,]
 #' Save the harmonized data 
 #' 
 save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_harmonized.RData")
+
+
 
 #' # Session Info ####
 #' ***
