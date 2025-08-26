@@ -143,6 +143,9 @@ coloc[,trait2 := c("BMI females","BMI males","BMI sex-combined",rep("PCOS",3))]
 
 save(coloc,file = "/Users/harshikamohanraj/Downloads/Coloc.RData")
 
+
+
+
 #' # Session Info ####
 #' ***
 sessionInfo()

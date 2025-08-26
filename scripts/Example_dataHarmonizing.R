@@ -139,7 +139,6 @@ plot(BMI_comb$Freq_Tested_Allele, PCOS$effect_allele_frequency)
 #' Remove the outlier that have different allele frquencies. 
 filt = abs(BMI_fem$Freq_Tested_Allele - PCOS$effect_allele_frequency) >0.1
 table(filt)
-
 PCOS = PCOS[!filt,]
 BMI_comb = BMI_comb[!filt,]
 BMI_mal = BMI_mal[!filt,]

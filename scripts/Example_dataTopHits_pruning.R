@@ -89,25 +89,46 @@ names(BMI_comb)
 # install.packages("remotes") # Run if remotes package not installed
 library(remotes)
 install_github("MRCIEU/TwoSampleMR")
-
 require(TwoSampleMR)
-#' MR analysis 
-BMI_fem
 
-read_exposure_data(
-  BMI_fem,
-  clump = FALSE,
-  snp_col = "SNP",
-  beta_col = "BETA",
-  se_col = "SE",
-  eaf_col = "Freq_Tested_Allele",
-  effect_allele_col = "Tested_Allele",
-  other_allele_col = "Other_allele",
-  pval_col = "P",
-  min_pval = 1e-200,
-  log_pval = FALSE,
-  chr_col = "CHR",
-)
+library(tidyverse)    # Data wrangling 
+library(TwoSampleMR)  # MR 
+library(gt)
+#' MR analysis 
+PCOS
+exposure_data <- BMI_fem
+outcome_data <- PCOS
+
+#Wald ratio corresponds to the log odds ratio for the outcome per unit change of the exposure.
+#ratio of coefficients, or the Wald ratio -estimating the causal effect of the exposure on the outcome
+wald_ratio <- outcome_data$beta/exposure_data$BETA
+wald_ratio_standard_error <- outcome_data$standard_error/exposure_data$BETA
+z_statistic <- wald_ratio/wald_ratio_standard_error
+p_value <- 2*pnorm(abs(z_statistic) ,lower.tail=F)
+
+x<- wald_ratio
+y<- wald_ratio_standard_error
+z_statistic
+p_value
+
+IVW_weights <- outcome_data$standard_error^(-2)
+inverse_weighted_LR <- lm(outcome_data$beta ~ exposure_data$BETA
+                          - 1 ,weights=IVW_weights)
+summary(inverse_weighted_LR) # intercept term here is zero in order to calculate the IVW estimate
+
+#MR-Egger Regression
+MR_egger_regression <- lm(outcome_data$beta ~ exposure_data$BETA,
+                          weights=1/IVW_weights)
+summary(MR_egger_regression) 
+
+#alternative 
+mr_obj = mr_input(bx = as.numeric(exposure$BETA),
+                  bxse = as.numeric(exposure$SE),
+                  by = as.numeric(outcome2$beta),
+                  byse = as.numeric(outcome2$SE),
+                  exposure = paste(myHormone$phenotype,myHormone$setting,sep="_"),
+                  outcome = myGene$GeneSymbol,
+                  snps = exposure$rsID)
 
 #' # Session Info ####
 #' ***
