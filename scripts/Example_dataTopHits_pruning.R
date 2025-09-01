@@ -94,10 +94,17 @@ require(TwoSampleMR)
 library(tidyverse)    # Data wrangling 
 library(TwoSampleMR)  # MR 
 library(gt)
+
 #' MR analysis 
 PCOS
 exposure_data <- BMI_fem
 outcome_data <- PCOS
+
+library(qqman)
+manhattan(BMI_fem, chr = "CHR", bp = "POS", p = "P", snp = "SNP", suggestiveline = -log10(1e-04), logp = TRUE)
+BMI_fem %>% filter(P < 1e-04)
+
+manhattan(PCOS, chr = "chromosome", bp = "base_pair_location", p = "effect_allele_frequency", snp = "effect_allele", suggestiveline = -log10(1e-04), logp = TRUE)
 
 #Wald ratio corresponds to the log odds ratio for the outcome per unit change of the exposure.
 #ratio of coefficients, or the Wald ratio -estimating the causal effect of the exposure on the outcome
@@ -121,14 +128,74 @@ MR_egger_regression <- lm(outcome_data$beta ~ exposure_data$BETA,
                           weights=1/IVW_weights)
 summary(MR_egger_regression) 
 
-#alternative 
-mr_obj = mr_input(bx = as.numeric(exposure$BETA),
-                  bxse = as.numeric(exposure$SE),
-                  by = as.numeric(outcome2$beta),
-                  byse = as.numeric(outcome2$SE),
-                  exposure = paste(myHormone$phenotype,myHormone$setting,sep="_"),
-                  outcome = myGene$GeneSymbol,
-                  snps = exposure$rsID)
+#alternative bmi fem 
+mr_obj_bf = mr_input(bx = BMI_fem$BETA,
+                  bxse = BMI_fem$SE,
+                  by = PCOS$beta,
+                  byse = PCOS$standard_error,
+                  )
+#IVW estimate can also be obtained by direct calculation
+bx <- BMI_fem$BETA
+bxse <- BMI_fem$SE
+by <- PCOS$beta
+byse <- PCOS$standard_error
+sum(by*bx*byse^-2)/sum(bx^2*byse^-2)
+
+
+mr_ivw(mr_obj_bf)
+mr_allmethods(mr_obj_bf)
+# scatter plot
+mr_plot(mr_obj_bf)
+# single snp plot
+mr_forest(mr_obj_bf, ordered=TRUE)
+# leave one out plot
+mr_loo(mr_obj_bf)
+# funnel plot
+mr_funnel(mr_obj_bf)
+
+#alternative bmi male 
+bmi_snps <- c("rs17757975", "rs116208210", "rs4714290")
+mr_obj_bm = mr_input(bx = as.numeric(BMI_mal$BETA),
+                     bxse = as.numeric(BMI_mal$SE),
+                     by = as.numeric(PCOS$beta),
+                     byse = as.numeric(PCOS$standard_error)
+)
+
+
+mr_ivw(mr_input(as.numeric(BMI_mal$BETA), as.numeric(BMI_mal$SE), as.numeric(PCOS$beta), as.numeric(PCOS$standard_error))
+mr_method_list()
+mr_allmethods(mr_obj_bm)
+mr_plot(mr_obj_bm, interactive=FALSE, orientate=TRUE)
+# single snp plot
+mr_forest(mr_obj_bm, ordered=TRUE)
+# leave one out plot
+mr_loo(mr_obj_bm)
+# funnel plot
+mr_funnel(mr_obj_bm)
+
+#alternative combined 
+mr_obj_com = mr_input(bx = as.numeric(BMI_comb$BETA),
+                     bxse = as.numeric(BMI_comb$SE),
+                     by = as.numeric(PCOS$beta),
+                     byse = as.numeric(PCOS$standard_error),
+)
+mr_ivw(mr_obj_com)
+mr_allmethods(mr_obj_com)
+
+
+# scatter plot
+mr_plot(mr_obj_com)
+# single snp plot
+mr_forest(mr_obj_com, ordered=TRUE)
+# leave one out plot
+mr_loo(mr_obj_com)
+# funnel plot
+mr_funnel(mr_obj_com)
+
+## alternative 
+
+
+
 
 #' # Session Info ####
 #' ***

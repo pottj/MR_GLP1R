@@ -40,7 +40,6 @@ Venkatesh_PCOS = "/Users/harshikamohanraj/Downloads/GCST90483500.h.tsv"
 BMI_fem = fread( "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.females.23May2018.txt")
 BMI_mal = fread("/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.males.23May2018.txt")
 BMI_comb = fread("/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt")
-
 PCOS = fread("/Users/harshikamohanraj/Downloads/PCOS_sumstats.tsv")
 
 #' # Filter data ####
@@ -69,6 +68,7 @@ names(PCOS)
 PCOS = PCOS[chromosome==6,]
 PCOS = PCOS[base_pair_location > 39016574 - 1e6,]
 PCOS = PCOS[base_pair_location < 39055519 + 1e6,]
+
 
 #' Remove variants with very low frequency
 BMI_fem = BMI_fem[Freq_Tested_Allele >=0.01 & Freq_Tested_Allele <=0.99,]
