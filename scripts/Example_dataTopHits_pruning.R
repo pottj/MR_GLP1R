@@ -179,6 +179,10 @@ mr_obj_fem = mr_input(bx = as.numeric(BMI_fem[BMI_fem$rsID %in% c("rs17757975","
                      byse = as.numeric(PCOS[PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290"),]$standard_error),
 )
 
+mr_ivw(mr_input(bx = as.numeric(BMI_fem[BMI_fem$rsID %in% c("rs17757975","rs116208210","rs4714290"),]$BETA),
+                bxse = as.numeric(BMI_fem[BMI_fem$rsID %in% c("rs17757975","rs116208210","rs4714290"),]$SE),
+                by = as.numeric(PCOS[PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290"),]$beta),
+                byse = as.numeric(PCOS[PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290"),]$standard_error)))
 mr_allmethods(mr_obj_fem)
 mr_plot(mr_obj_fem)
 mr_loo(mr_obj_fem)
