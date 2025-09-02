@@ -110,15 +110,15 @@ my.res3 <- coloc.abf(dataset1=data_males,
                      dataset2=data_combined)
 sensitivity(my.res3,rule="H4 > 0.5") 
 
-#' **Result males vs. sex-combined data**: shared signal (though there might be a second signal!)
+#' **Result males vs. sex-combined data**: no shared signal (though there might be a second signal!)
 #' 
-my.res4 <- coloc.abf(dataset1=data_females,
+my.res4 <- coloc.abf(dataset1=data_males,
                      dataset2=data_PCOS)
 sensitivity(my.res4,rule="H4 > 0.5") 
 
 #' **Result males vs. PCOS**: no shared signal, most likely only signal for BMI 
 #' 
-my.res5 <- coloc.abf(dataset1=data_males,
+my.res5 <- coloc.abf(dataset1=data_combined,
                      dataset2=data_PCOS)
 sensitivity(my.res5,rule="H4 > 0.5") 
 

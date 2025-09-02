@@ -142,7 +142,6 @@ byse <- PCOS$standard_error
 sum(by*bx*byse^-2)/sum(bx^2*byse^-2)
 
 
-mr_ivw(mr_obj_bf)
 mr_allmethods(mr_obj_bf)
 # scatter plot
 mr_plot(mr_obj_bf)
@@ -159,9 +158,7 @@ mr_obj_bm = mr_input(bx = as.numeric(BMI_mal$BETA),
                      bxse = as.numeric(BMI_mal$SE),
                      by = as.numeric(PCOS$beta),
                      byse = as.numeric(PCOS$standard_error)
-)
-
-
+                     )
 mr_ivw(mr_input(as.numeric(BMI_mal$BETA), as.numeric(BMI_mal$SE), as.numeric(PCOS$beta), as.numeric(PCOS$standard_error))
 mr_method_list()
 mr_allmethods(mr_obj_bm)
@@ -174,17 +171,24 @@ mr_loo(mr_obj_bm)
 mr_funnel(mr_obj_bm)
 
 #alternative combined 
-mr_obj_com = mr_input(bx = as.numeric(BMI_comb$BETA),
-                     bxse = as.numeric(BMI_comb$SE),
-                     by = as.numeric(PCOS$beta),
-                     byse = as.numeric(PCOS$standard_error),
+BMI_fem[BMI_fem$rsID %in% c("rs17757975","rs116208210","rs4714290"),]
+PCOS[PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290"),]
+mr_obj_fem = mr_input(bx = as.numeric(BMI_fem[BMI_fem$rsID %in% c("rs17757975","rs116208210","rs4714290"),]$BETA),
+                     bxse = as.numeric(BMI_fem[BMI_fem$rsID %in% c("rs17757975","rs116208210","rs4714290"),]$SE),
+                     by = as.numeric(PCOS[PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290"),]$beta),
+                     byse = as.numeric(PCOS[PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290"),]$standard_error),
 )
-mr_ivw(mr_obj_com)
-mr_allmethods(mr_obj_com)
 
+mr_allmethods(mr_obj_fem)
+mr_plot(mr_obj_fem)
+mr_loo(mr_obj_fem)
+mr_forest(mr_obj_fem, ordered=TRUE)
 
 # scatter plot
-mr_plot(mr_obj_com)
+snps_of_interest <- c("rs17757975", "rs116208210", "rs4714290")
+
+mr_plot(mr_obj_com, SNP= c("rs17757975", "rs116208210", "rs4714290"))
+
 # single snp plot
 mr_forest(mr_obj_com, ordered=TRUE)
 # leave one out plot
@@ -192,9 +196,9 @@ mr_loo(mr_obj_com)
 # funnel plot
 mr_funnel(mr_obj_com)
 
-## alternative 
-
-
+##MR alternative 
+harmonised_data = fread("/Users/harshikamohanraj/Downloads/Input_harmonized.RData")
+res <- mr(harmonised_data)
 
 
 #' # Session Info ####
