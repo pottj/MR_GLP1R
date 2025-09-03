@@ -75,7 +75,7 @@ mr_obj_fem = mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),
                       byse = as.numeric(PCOS$standard_error[filt_PCOS]),
                       )
        
-#mr_ivw(mr_obj_fem)
+mr_ivw(mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),bxse = as.numeric(BMI_fem$SE[filt_fem]),by = as.numeric(PCOS$beta[filt_PCOS]), byse = as.numeric(PCOS$standard_error[filt_PCOS]))
 mr_allmethods(mr_obj_fem)
 mr_plot(mr_obj_fem)
 mr_loo(mr_obj_fem)
