@@ -124,7 +124,7 @@ sensitivity(my.res5,rule="H4 > 0.5")
 
 #' **Result sex-combined vs. PCOS**: no shared signal, most likely only signal for BMI 
 #' 
-my.res6 <- coloc.abf(dataset1=data_combined,
+my.res6 <- coloc.abf(dataset1=data_females,
                      dataset2=data_PCOS)
 sensitivity(my.res6,rule="H4 > 0.5") 
 
@@ -142,8 +142,6 @@ coloc[,trait1 := c("BMI females","BMI females","BMI males","BMI females","BMI ma
 coloc[,trait2 := c("BMI females","BMI males","BMI sex-combined",rep("PCOS",3))]
 
 save(coloc,file = "/Users/harshikamohanraj/Downloads/Coloc.RData")
-
-
 
 
 #' # Session Info ####

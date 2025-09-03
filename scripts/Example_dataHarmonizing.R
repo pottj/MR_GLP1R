@@ -31,9 +31,7 @@ Pulit_BMI_male = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis
 Pulit_BMI_combined = "/Users/harshikamohanraj/Downloads/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt"
 
 # GWAS summary statistics for PCOS
-
 Venkatesh_PCOS = "/Users/harshikamohanraj/Downloads/GCST90483500.h.tsv"
-
 
 #' # Load data ####
 #' ***
