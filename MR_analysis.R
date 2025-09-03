@@ -29,10 +29,10 @@ library(TwoSampleMR)  # MR
 library(gt)
 library(qqman)
 
-
-manhattan(BMI_fem, chr = "CHR", bp = "POS", p = "P", snp = "SNP", suggestiveline = -log10(1e-04), logp = TRUE)
-BMI_fem %>% filter(P < 1e-04)
-manhattan(PCOS, chr = "chromosome", bp = "base_pair_location", p = "effect_allele_frequency", snp = "effect_allele", suggestiveline = -log10(1e-04), logp = TRUE)
+#visual manhattanplot
+#manhattan(BMI_fem, chr = "CHR", bp = "POS", p = "P", snp = "SNP", suggestiveline = -log10(1e-04), logp = TRUE)
+#BMI_fem %>% filter(P < 1e-04)
+#manhattan(PCOS, chr = "chromosome", bp = "base_pair_location", p = "effect_allele_frequency", snp = "effect_allele", suggestiveline = -log10(1e-04), logp = TRUE)
 
 # 1 - DIRECT CALCULATIONS 
 #Wald ratio - corresponds to the log odds ratio for the outcome per unit change of the exposure.

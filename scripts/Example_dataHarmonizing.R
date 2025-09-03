@@ -149,6 +149,51 @@ BMI_fem = BMI_fem[!filt,]
 save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_harmonized.RData")
 
 
+#Positive controls harmonising 
+all_cause = fread("/Users/harshikamohanraj/Downloads/lifegen_phase2_bothpl_alldr_2017_09_18.tsv")
+
+all_cause = all_cause[chr==6,]
+all_cause = all_cause[pos > 39016574 - 1e6,]
+all_cause = all_cause[pos < 39055519 + 1e6,]
+#' Remove variants with very low frequency
+all_cause = all_cause[freq1 >=0.01 & freq1 <=0.99,]
+
+#' Check overlap of rsID
+all_cause = all_cause[rsid %in% BMI_fem$rsID & rsid %in% BMI_mal$rsID & rsid %in% BMI_comb$rsID,]
+BMI_fem = BMI_fem[rsID %in% all_cause$rsid, ]
+BMI_mal = BMI_mal[rsID %in% all_cause$rsid, ]
+BMI_comb = BMI_comb[rsID %in% all_cause$rsid, ]
+
+#' Check order of data sets
+setorder(all_cause,base_pair_location) #Alternative: match command - using id variable to order the other datasets 
+stopifnot(BMI_comb$rsID == all_cause$rsid)
+
+#' **Summary**: There are 6125 SNPs at the _GLP1R_ locus that are 
+#' 
+#' - available in females, males, and sex-combined BMI data and all_cause,
+#' - have MAF>0.01
+#' - are not triallelic or duplicated
+#'
+#' # Harmonize alleles ####
+#' ***
+
+#' In the PCOS data, there are 3,383 SNPs with same allele coding as the BMI data, and 2,742 SNPs with switch alleles. These SNPs will be flipped back to the BMI coding. 
+#' 
+filt = BMI_comb$Tested_Allele == all_cause$a0 & 
+  BMI_comb$Other_Allele == all_cause$a1
+table(filt)
+all_cause[filt,beta1 := beta1 * (-1)]
+all_cause[filt,a1 := 1-a1]
+all_cause[filt,a1 := BMI_comb[filt,Tested_Allele]]
+all_cause[filt,a0 := BMI_comb[filt,Other_Allele]]
+
+#' Now check the transformation with the EAF plot again. 
+plot(BMI_comb$Freq_Tested_Allele, all_cause$a1)
+
+#' Remove the outlier that have different allele frquencies. 
+filt = abs(BMI_fem$Freq_Tested_Allele - all_cause$a1) >0.1
+table(filt)
+all_cause = all_cause[!filt,]
 
 #' # Session Info ####
 #' ***
