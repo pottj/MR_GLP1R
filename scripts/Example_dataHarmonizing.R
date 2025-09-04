@@ -165,7 +165,7 @@ BMI_mal = BMI_mal[rsID %in% all_cause$rsid, ]
 BMI_comb = BMI_comb[rsID %in% all_cause$rsid, ]
 
 #' Check order of data sets
-setorder(all_cause,base_pair_location) #Alternative: match command - using id variable to order the other datasets 
+setorder(all_cause,pos) #Alternative: match command - using id variable to order the other datasets 
 stopifnot(BMI_comb$rsID == all_cause$rsid)
 
 #' **Summary**: There are 6125 SNPs at the _GLP1R_ locus that are 
@@ -183,15 +183,17 @@ filt = BMI_comb$Tested_Allele == all_cause$a0 &
   BMI_comb$Other_Allele == all_cause$a1
 table(filt)
 all_cause[filt,beta1 := beta1 * (-1)]
-all_cause[filt,a1 := 1-a1]
+all_cause[filt,freq1 := 1-freq1]
 all_cause[filt,a1 := BMI_comb[filt,Tested_Allele]]
 all_cause[filt,a0 := BMI_comb[filt,Other_Allele]]
 
 #' Now check the transformation with the EAF plot again. 
-plot(BMI_comb$Freq_Tested_Allele, all_cause$a1)
+plot(BMI_comb$Freq_Tested_Allele, all_cause$freq1)
+
+head(all_cause)
 
 #' Remove the outlier that have different allele frquencies. 
-filt = abs(BMI_fem$Freq_Tested_Allele - all_cause$a1) >0.1
+filt = abs(BMI_fem$Freq_Tested_Allele - all_cause$freq1) >0.1
 table(filt)
 all_cause = all_cause[!filt,]
 
