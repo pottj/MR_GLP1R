@@ -11,10 +11,13 @@
 - created github repository
 - added some example scripts for data harmonization, top-list creation and colocalization
 
-## 19/08/2025
-
-this is just a test if branching & merging works!
-
 ## 18/08/2025
 - running script so far
 - downloading dataset 
+
+## 19/08/2025
+- running MR 
+
+
+## 20/08/2025
+- running harmonisation and pruning

@@ -1,0 +1,237 @@
+#' ---
+#' title: "MR analysis"
+#' subtitle: ""
+#' author: "Harshika Mohan Raj"
+#' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+#' output:
+#'   html_document:
+#'     toc: true
+#'     number_sections: true
+#'     toc_float: true
+#'     code_folding: show
+#' ---
+#'
+#' # Introduction ####
+#' ***
+#' # Initialize ####
+#' ***
+rm(list = ls())
+time0<-Sys.time()
+#' # Load data ####
+#' ***
+
+#visual manhattanplot
+#manhattan(BMI_fem, chr = "CHR", bp = "POS", p = "P", snp = "SNP", suggestiveline = -log10(1e-04), logp = TRUE)
+#BMI_fem %>% filter(P < 1e-04)
+#manhattan(PCOS, chr = "chromosome", bp = "base_pair_location", p = "effect_allele_frequency", snp = "effect_allele", suggestiveline = -log10(1e-04), logp = TRUE)
+
+# 1 - DIRECT CALCULATIONS 
+#Wald ratio - corresponds to the log odds ratio for the outcome per unit change of the exposure.
+#ratio of coefficients, or the Wald ratio -estimating the causal effect of the exposure on the outcome
+wald_ratio <- outcome_data$beta/exposure_data$BETA
+wald_ratio_standard_error <- outcome_data$standard_error/exposure_data$BETA
+z_statistic <- wald_ratio/wald_ratio_standard_error
+p_value <- 2*pnorm(abs(z_statistic) ,lower.tail=F)
+x<- wald_ratio
+y<- wald_ratio_standard_error
+z_statistic
+p_value
+
+#IVW
+IVW_weights <- outcome_data$standard_error^(-2)
+inverse_weighted_LR <- lm(outcome_data$beta ~ exposure_data$BETA
+                          - 1 ,weights=IVW_weights)
+summary(inverse_weighted_LR) # intercept term here is zero in order to calculate the IVW estimate
+
+#MR-Egger Regression
+MR_egger_regression <- lm(outcome_data$beta ~ exposure_data$BETA,
+                          weights=1/IVW_weights)
+summary(MR_egger_regression) 
+
+#IVW alt
+bx <- BMI_fem$BETA
+bxse <- BMI_fem$SE
+by <- PCOS$beta
+byse <- PCOS$standard_error
+sum(by*bx*byse^-2)/sum(bx^2*byse^-2)
+
+
+# 2 - MR PACKAGE METHOD 
+#BMI female (exposure) vs PCOS (outcome)
+filt_fem = BMI_fem$rsID %in% c("rs17757975","rs116208210","rs4714290")
+filt_PCOS = PCOS$rs_id %in% c("rs17757975","rs116208210","rs4714290")
+mr_obj_fem = mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),
+                      bxse = as.numeric(BMI_fem$SE[filt_fem]),
+                      by = as.numeric(PCOS$beta[filt_PCOS]),
+                      byse = as.numeric(PCOS$standard_error[filt_PCOS]),
+                      )
+       
+mr_ivw(mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),bxse = as.numeric(BMI_fem$SE[filt_fem]),by = as.numeric(PCOS$beta[filt_PCOS]), byse = as.numeric(PCOS$standard_error[filt_PCOS]))
+mr_allmethods(mr_obj_fem)
+mr_plot(mr_obj_fem)
+mr_loo(mr_obj_fem)
+mr_forest(mr_obj_fem, ordered=TRUE)
+
+#BMI male (exposure) vs PCOS (outcome)
+filt_mal = BMI_mal$rsID %in% c("rs17757975","rs2254336","rs4714290")
+filt_PCOS = PCOS$rs_id %in% c("rs17757975","rs2254336","rs4714290")
+mr_obj_mal = mr_input(bx = as.numeric(BMI_mal$BETA[filt_mal]),
+                      bxse = as.numeric(BMI_mal$SE[filt_mal]),
+                      by = as.numeric(PCOS$beta[filt_PCOS]),
+                      byse = as.numeric(PCOS$standard_error[filt_PCOS]),
+                      )
+
+#mr_ivw(mr_obj_mal)
+mr_allmethods(mr_obj_mal)
+mr_plot(mr_obj_mal)
+mr_loo(mr_obj_mal)
+mr_forest(mr_obj_mal, ordered=TRUE)   
+
+#BMI combined (exposure) vs PCOS (outcome)
+filt_com = BMI_comb$rsID %in% c("rs17757975", "rs4714290")
+filt_PCOS = PCOS$rs_id %in% c("rs17757975","rs4714290")
+mr_obj_comb = mr_input(bx = as.numeric(BMI_comb$BETA[filt_com]),
+                      bxse = as.numeric(BMI_comb$SE[filt_com]),
+                      by = as.numeric(PCOS$beta[filt_PCOS]),
+                      byse = as.numeric(PCOS$standard_error[filt_PCOS]),
+                      )
+
+#mr_ivw(mr_obj_comb)
+mr_allmethods(mr_obj_comb)
+mr_plot(mr_obj_comb)
+mr_loo(mr_obj_comb)
+mr_forest(mr_obj_comb, ordered=TRUE)   
+
+##Positive control = all-cause-mortality 
+#filtering
+filt_allc = all_cause$rsid %in% c("rs17757975","rs116208210","rs4714290")
+
+#BMI female (exposure) vs all_cause (outcome)
+mr_obj_fema = mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),
+                      bxse = as.numeric(BMI_fem$SE[filt_fem]),
+                      by = as.numeric(all_cause$beta1[filt_allc]),
+                      byse = as.numeric(all_cause$se[filt_allc]),
+)
+
+mr_ivw( mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),
+                 bxse = as.numeric(BMI_fem$SE[filt_fem]),
+                 by = as.numeric(all_cause$beta1[filt_allc]),
+                 byse = as.numeric(all_cause$se[filt_allc]),
+))
+mr_allmethods(mr_obj_fema)
+mr_plot(mr_obj_fema)
+mr_loo(mr_obj_fema)
+mr_forest(mr_obj_fema, ordered=TRUE)
+
+#BMI male (exposure) vs all_cause (outcome)
+mr_obj_mala = mr_input(bx = as.numeric(BMI_mal$BETA[filt_mal]),
+                      bxse = as.numeric(BMI_mal$SE[filt_mal]),
+                      by = as.numeric(all_cause$beta1[filt_allc]),
+                      byse = as.numeric(all_cause$se[filt_allc]),
+)
+
+mr_ivw(mr_input(bx = as.numeric(BMI_mal$BETA[filt_mal]),
+                             bxse = as.numeric(BMI_mal$SE[filt_mal]),
+                             by = as.numeric(all_cause$beta1[filt_allc]),
+                             byse = as.numeric(all_cause$se[filt_allc]),
+))
+mr_allmethods(mr_obj_mala)
+mr_plot(mr_obj_mala)
+mr_loo(mr_obj_mala )
+mr_forest(v, ordered=TRUE)   
+
+#BMI combined (exposure) vs all_cause (outcome)
+mr_obj_comba = mr_input(bx = as.numeric(BMI_comb$BETA[filt_com]),
+                       bxse = as.numeric(BMI_comb$SE[filt_com]),
+                       by = as.numeric(all_cause$beta1[filt_allc]),
+                       byse = as.numeric(all_cause$se[filt_allc]),
+)
+
+mr_ivw(mr_input(bx = as.numeric(BMI_comb$BETA[filt_com]),
+                bxse = as.numeric(BMI_comb$SE[filt_com]),
+                by = as.numeric(all_cause$beta1[filt_allc]),
+                byse = as.numeric(all_cause$se[filt_allc]),
+))
+mr_allmethods(mr_obj_comba)
+mr_plot(mr_obj_comba)
+mr_loo(mr_obj_comba)
+mr_forest(mr_obj_comba, ordered=TRUE)   
+
+##Positive control = CAD
+#filtering
+filt_cad = cad$rsid %in% c("rs17757975","rs116208210","rs4714290")
+BMI_comb[filt_cad,rsID]
+#BMI combined (exposure) vs cad (outcome)
+mr_obj_combc = mr_input(bx = as.numeric(BMI_fem$BETA[filt_cad]),
+                       bxse = as.numeric(BMI_fem$SE[filt_cad]),
+                       by = as.numeric(cad$female_beta[filt_cad]),
+                       byse = as.numeric(cad$female_se[filt_cad]),
+                       snps = cad$rsid_ukb[filt_cad]
+)
+
+mr_ivw(mr_obj_combc)
+mr_allmethods(mr_obj_combc)
+mr_plot(mr_obj_combc)
+mr_loo(mr_obj_combc)
+mr_forest(mr_obj_combc, ordered=TRUE)   
+
+head(cad)
+
+### HbA1c
+#HbA1c  (exposure) vs PCOS (outcome)
+filt_hb = hb$rsID %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
+filt_PCOS = PCOS$rs_id %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
+mr_obj_hb = mr_input(bx = as.numeric(filt_hb$BETA[filt_hb]),
+                      bxse = as.numeric(filt_hb$SE[filt_hb]),
+                      by = as.numeric(PCOS$beta[filt_PCOS]),
+                      byse = as.numeric(PCOS$standard_error[filt_PCOS]),
+)
+
+mr_ivw(mr_obj_hb)
+mr_allmethods(mr_obj_hb)
+mr_plot(mr_obj_hb)
+mr_loo(mr_obj_hb)
+mr_forest(mr_obj_hb, ordered=TRUE)
+
+##Positive control = all-cause-mortality 
+#filtering
+filt_allc = all_cause$rsid %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
+
+#BMI female (exposure) vs all_cause (outcome)
+mr_obj_hb1 = mr_input(bx = as.numeric(hb$BETA[filt_hb]),
+                       bxse = as.numeric(hb$SE[filt_hb]),
+                       by = as.numeric(all_cause$beta1[filt_ac]),
+                       byse = as.numeric(all_cause$se[filt_ac]),
+)
+
+mr_ivw(mr_obj_hb1)
+mr_allmethods(mr_obj_hb1)
+mr_plot(mr_obj_hb1)
+mr_loo(mr_obj_hb1)
+mr_forest(mr_obj_hb1, ordered=TRUE)
+
+##Positive control = CAD
+#filtering
+filt_cad = cad$rsid %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
+hb[filt_cad,rsID]
+#BMI combined (exposure) vs cad (outcome)
+mr_obj_hb2 = mr_input(bx = as.numeric(hb$BETA[filt_cad]),
+                        bxse = as.numeric(hb$SE[filt_cad]),
+                        by = as.numeric(cad$female_beta[filt_cad]),
+                        byse = as.numeric(cad$female_se[filt_cad]),
+                        snps = cad$rsid_ukb[filt_cad]
+)
+
+mr_ivw(mr_obj_hb2)
+mr_allmethods(mr_obj_hb2)
+mr_plot(mr_obj_hb2)
+mr_loo(mr_obj_hb2)
+mr_forest(mr_obj_hb2, ordered=TRUE)   
+
+
+#' # Save ####
+#' ***
+#' # Session Info ####
+#' ***
+sessionInfo()
+message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")

@@ -1,7 +1,7 @@
 #' ---
-#' title: "Example script for top SNP identification"
+#' title: "Top SNP identification"
 #' subtitle: ""
-#' author: "Janne Pott"
+#' author: "Janne Pott and Harshika Mohan Raj"
 #' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'   html_document:
@@ -13,7 +13,7 @@
 #'
 #' # Introduction ####
 #' ***
-#' In this example script, I load data the harmonized data for BMI and check for potential instruments in the three data sets. 
+#' Load data the harmonized data for BMI/ HbC1a and check for potential instruments in the three data sets. 
 #' 
 #' All necessary R packages and paths to data files are in the source file
 #' 
@@ -23,13 +23,10 @@
 #' ***
 rm(list = ls())
 time0<-Sys.time()
-
-source("../SourceFile.R")
-
 #' # Load data ####
 #' ***
-load("../data/Input_harmonized.RData")
 
+### BMI
 #' # Significant SNPs ####
 #' ***
 #' Check number of significant SNPs
@@ -87,15 +84,53 @@ BMI_fem[rsID %in% topList$rsID]
 #' ***
 #' Save the harmonized data 
 #' 
-BMI_comb = BMI_comb[rsID %in% topList$rsID]
-BMI_mal = BMI_mal[rsID %in% topList$rsID]
-BMI_fem = BMI_fem[rsID %in% topList$rsID]
-PCOS = PCOS[rsid %in% topList$rsID]
+save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_TopHitsPruned.RData")
 
-save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "../data/Input_TopHitsPruned.RData")
+### HbA1c 
+#' # Significant SNPs ####
+#' ***
+#' Check number of significant SNPs
+hb[,table(P<5e-8,P<1e-6)]
+
+#' Add setting parameter for later re-identification
+hb[,setting := "combined"]
+
+#' Combine all settings, and filter for genome-wide significant SNPs
+hb = hb[P<5e-8,]
+hb[,length(unique(rsID))]
+hb[,table(setting)]
+
+#' There are 42 unique SNPs that reach genome-wide significance in at least one setting. 
+#' 
+#' # Pruning ####
+#' ***
+#' Now I print the rsIDs of the 42 SNPs and copy them into LDlink: https://ldlink.nih.gov/?tab=ldmatrix - using European as reference population. 
+#' 
+hb$rsID
+
+#' There are four clusters, nicely sorted by position. Hence, I add a cluster variable by position information
+setorder(BMI,POS)
+hb[,cluster := "cluster1"]
+hb[POS<=38227592,cluster := "cluster1"]
+hb[POS>38227592 & POS<= 39044558,cluster := "cluster2"]
+hb[POS>39044558 & POS<= 39920827,cluster := "cluster3"]
+hb[POS>39920827,cluster := "cluster4"]
+
+#' Now I get the best SNP per cluster (lowest p-value)
+topList = copy(hb)
+setorder(topList,P)
+topList = topList[!duplicated(cluster)]
+topList[,table(setting)]
+setorder(topList,POS)
+topList
+
+#' # Check per setting ####
+#' ***
+hb[rsID %in% topList$rsID]
 
 #' # Session Info ####
 #' ***
 sessionInfo()
 message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
+
 
