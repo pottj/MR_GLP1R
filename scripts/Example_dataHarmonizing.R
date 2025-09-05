@@ -1,7 +1,7 @@
 #' ---
-#' title: "Example script for data harmonization"
+#' title: "Harmonization"
 #' subtitle: ""
-#' author: "Janne Pott and Harshika Mohan Raj (edits)"
+#' author: "Janne Pott and Harshika Mohan Raj"
 #' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'   html_document:
@@ -13,7 +13,7 @@
 #'
 #' # Introduction ####
 #' ***
-#' In this example script, I load data for an exposure (BMI) and outcome (PCOS), and harmonize the effect alleles. 
+#' Load data for an exposure (BMI) and outcome (PCOS), and harmonize the effect alleles. 
 #' 
 #' All necessary R packages and paths to data files are in the source file
 #' 
@@ -149,7 +149,7 @@ BMI_fem = BMI_fem[!filt,]
 save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Downloads/Input_harmonized.RData")
 
 
-#Positive controls harmonising 
+##Positive controls harmonising - ALL-CAUSE MORTALITY 
 all_cause = fread("/Users/harshikamohanraj/Downloads/lifegen_phase2_bothpl_alldr_2017_09_18.tsv")
 
 all_cause = all_cause[chr==6,]
@@ -167,18 +167,9 @@ BMI_comb = BMI_comb[rsID %in% all_cause$rsid, ]
 #' Check order of data sets
 setorder(all_cause,pos) #Alternative: match command - using id variable to order the other datasets 
 stopifnot(BMI_comb$rsID == all_cause$rsid)
-
-#' **Summary**: There are 6125 SNPs at the _GLP1R_ locus that are 
-#' 
-#' - available in females, males, and sex-combined BMI data and all_cause,
-#' - have MAF>0.01
-#' - are not triallelic or duplicated
-#'
+head(all_cause)
 #' # Harmonize alleles ####
 #' ***
-
-#' In the PCOS data, there are 3,383 SNPs with same allele coding as the BMI data, and 2,742 SNPs with switch alleles. These SNPs will be flipped back to the BMI coding. 
-#' 
 filt = BMI_comb$Tested_Allele == all_cause$a0 & 
   BMI_comb$Other_Allele == all_cause$a1
 table(filt)
@@ -196,6 +187,123 @@ head(all_cause)
 filt = abs(BMI_fem$Freq_Tested_Allele - all_cause$freq1) >0.1
 table(filt)
 all_cause = all_cause[!filt,]
+
+
+##Positive controls harmonising - CAD 
+cad = fread("/Users/harshikamohanraj/Downloads/CAD_GWAS_SEX_STRATIFIED.txt.gz")
+
+head(cad)
+head(all_cause)
+cad = cad[CHR==6,]
+cad = cad[BP > 39016574 - 1e6,]
+cad = cad[BP < 39055519 + 1e6,]
+#' Remove variants with very low frequency
+cad = cad[eaf >=0.01 & eaf <=0.99,]
+
+#' Check overlap of rsID
+cad = cad[rsid_ukb %in% BMI_fem$rsID & rsid_ukb %in% BMI_mal$rsID & rsid_ukb %in% BMI_comb$rsID,]
+BMI_fem = BMI_fem[rsID %in% cad$rsid_ukb, ]
+BMI_mal = BMI_mal[rsID %in% cad$rsid_ukb, ]
+BMI_comb = BMI_comb[rsID %in% cad$rsid_ukb, ]
+
+#' Check order of data sets
+setorder(cad,BP) #Alternative: match command - using id variable to order the other datasets 
+stopifnot(BMI_comb$rsID == cad$rsid_ukb)
+
+#' # Harmonize alleles ####
+#' ***
+filt = BMI_comb$Tested_Allele == cad$other_allele & 
+  BMI_comb$Other_Allele == cad$reference_allele
+table(filt)
+cad[filt,beta := beta * (-1)]
+cad[filt,eaf := 1-eaf]
+cad[filt,reference_allele := BMI_comb[filt,Tested_Allele]]
+cad[filt,other_allele := BMI_comb[filt,Other_Allele]]
+
+#' Now check the transformation with the EAF plot again. 
+plot(BMI_comb$Freq_Tested_Allele, cad$eaf)
+
+
+#' Remove the outlier that have different allele frquencies. 
+filt = abs(BMI_fem$Freq_Tested_Allele - cad$eaf) >0.1
+table(filt)
+cad = cad[!filt,]
+BMI_comb = BMI_comb[!filt,]
+BMI_fem = BMI_fem[!filt,]
+BMI_mal = BMI_mal[!filt,]
+
+## OUTCOME 2 = HbA1c 
+hb = fread("/Users/harshikamohanraj/Downloads/30750_raw.gwas.imputed_v3.both_sexes.varorder.tsv.bgz")
+PCOS = fread("/Users/harshikamohanraj/Downloads/PCOS_sumstats.tsv")
+
+#' # Filter data ####
+#' ***
+#' location of GLPR1: 
+#' 
+var = unlist(strsplit(hb$variant,":"))
+chr = var[seq(1,length(var),4)]
+pos = var[seq(2,length(var),4)]
+a1 = var[seq(3,length(var),4)]
+a2 = var[seq(4,length(var),4)]
+
+hb[,chr := as.numeric(chr)]
+hb[,pos := as.numeric(pos)]
+hb[,a1 := as.numeric(a1)]
+hb[,a2 := as.numeric(a2)]
+head(hb)
+
+hb = hb[chr== "6",]
+hb = hb[pos > 39016574 - 1e6,]
+hb = hb[pos < 39055519 + 1e6,]
+
+names(hb)
+names(PCOS)
+PCOS = PCOS[chromosome==6,]
+PCOS = PCOS[base_pair_location > 39016574 - 1e6,]
+PCOS = PCOS[base_pair_location < 39055519 + 1e6,]
+
+#' Remove variants with very low frequency
+hb = hb[minor_AF >=0.01 & minor_AF <=0.99,]
+PCOS = PCOS[effect_allele_frequency >=0.01 & effect_allele_frequency <=0.99,]
+
+#' Check overlap of rsID
+hb[,rsID := gsub(":.*","",SNP)]
+PCOS = PCOS[rs_id %in% hb$rsID]
+hb = hb[rsID %in% PCOS$rs_id, ]
+
+# Check duplicates & triallelic SNPs
+hb[duplicated(SNP),]
+hb[duplicated(rsID),]
+hb[duplicated(POS),]
+
+#' Check order of data sets
+setorder(PCOS,base_pair_location) #Alternative: match command - using id variable to order the other datasets 
+stopifnot(hb$rsID == hb$rs_id)
+
+#' # Harmonize alleles ####
+#' ***
+#EA and OA -> renaming the columns 
+plot(hb$Freq_Tested_Allele, PCOS$effect_allele_frequency)
+
+#' In the PCOS data, there are 3,383 SNPs with same allele coding as the BMI data, and 2,742 SNPs with switch alleles. These SNPs will be flipped back to the BMI coding. 
+#' 
+filt = hb$Tested_Allele == PCOS$other_allele & 
+  hb$Other_Allele == PCOS$effect_allele
+table(filt)
+PCOS[filt,beta := beta * (-1)]
+PCOS[filt,effect_allele_frequency := 1-effect_allele_frequency]
+PCOS[filt,effect_allele := hb[filt,Tested_Allele]]
+PCOS[filt,other_allele := hb[filt,Other_Allele]]
+
+#' Now check the transformation with the EAF plot again. 
+plot(BMI_comb$Freq_Tested_Allele, PCOS$effect_allele_frequency)
+
+#' Remove the outlier that have different allele frquencies. 
+filt = abs(BMI_fem$Freq_Tested_Allele - PCOS$effect_allele_frequency) >0.1
+table(filt)
+PCOS = PCOS[!filt,]
+BMI_comb = BMI_comb[!filt,]
+
 
 #' # Session Info ####
 #' ***

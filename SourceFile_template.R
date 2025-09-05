@@ -17,6 +17,15 @@ suppressPackageStartupMessages(library(coloc))
 suppressPackageStartupMessages(library(readxl))
 suppressPackageStartupMessages(library(WriteXLS))
 
+# install.packages("remotes") # Run if remotes package not installed
+library(remotes)
+install_github("MRCIEU/TwoSampleMR")
+require(TwoSampleMR)
+library(tidyverse)    # Data wrangling 
+library(TwoSampleMR)  # MR 
+library(gt)
+library(qqman)
+
 #############################
 # path to data (root is the scripts folder)
 #############################

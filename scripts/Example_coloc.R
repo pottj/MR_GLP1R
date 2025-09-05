@@ -1,7 +1,7 @@
 #' ---
-#' title: "Example script for colocalization"
+#' title: "Colocalization"
 #' subtitle: ""
-#' author: "Janne Pott and Harshika Mohan Raj (edited)"
+#' author: "Janne Pott and Harshika Mohan Raj"
 #' date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'   html_document:
@@ -13,7 +13,7 @@
 #'
 #' # Introduction ####
 #' ***
-#' In this example script, I load data the harmonized data for BMI and check for shared signaling in males, females and the sex-combined data. 
+#' Load data the harmonized data for BMI and check for shared signaling in males, females and the sex-combined data. 
 #' 
 #' All necessary R packages and paths to data files are in the source file
 #' 
@@ -143,6 +143,49 @@ coloc[,trait2 := c("BMI females","BMI males","BMI sex-combined",rep("PCOS",3))]
 
 save(coloc,file = "/Users/harshikamohanraj/Downloads/Coloc.RData")
 
+
+
+### HbA1c -----------
+hb[,MAF := ifelse(Freq_Tested_Allele<0.5,Freq_Tested_Allele,1-Freq_Tested_Allele)]
+PCOS[,MAF := ifelse(effect_allele_frequency<0.5,effect_allele_frequency,1-effect_allele_frequency)]
+
+PCOS[,Ncases := 14467]
+PCOS[,Ncontrols := 430267]
+PCOS[,Ntotal := 444734]
+
+#' ## Create list objects 
+#' 
+#' Note: for PCOS, I use the position information of the BMI data, as PCOS is in hg38, not hg19. 
+#' 
+
+data_hb = list(beta = hb$BETA,
+                     varbeta = hb$SE^2,
+                     snp = hb$rsID,
+                     position = hb$POS,
+                     type = "quant",
+                     N = hb$N,
+                     MAF = hb$MAF)
+
+data_PCOS = list(beta = PCOS$beta,
+                 varbeta = PCOS$standard_error^2,
+                 snp = PCOS$rs_id,
+                 position = BMI_comb$POS,
+                 type = "cc",
+                 N = PCOS$Ntotal,
+                 MAF = PCOS$MAF)
+
+#' # Visualize locus ####
+#' ***
+plot_dataset(data_hb)
+plot_dataset(data_PCOS) 
+
+#' # Colocalization test ####
+#' ***
+my.res1 <- coloc.abf(dataset1=data_hb,
+                     dataset2=data_PCOS)
+sensitivity(my.res1,rule="H4 > 0.5") 
+
+#' **Result HbA1c vs. PCOS**: no shared signal (though there might be a second signal!)
 
 #' # Session Info ####
 #' ***

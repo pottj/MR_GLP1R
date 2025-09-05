@@ -39,6 +39,13 @@ To be updated, e.g.
 - **Exposure 2**: Haemoglobin A1C (HbA1C), lowered by GLP-1R activation 
 - **Data**: downloaded from UK Biobank (Neale lab). http://www.nealelab.is/uk-biobank/.)
 
+- **Outcome 2**: All-cause mortality 
+- **Publication**: Timmers PR, Mounier N, Lall K, Fischer K, Ning Z, Feng X, Bretherick AD, Clark DW; eQTLGen Consortium; Shen X, Esko T, Kutalik Z, Wilson JF, Joshi PK. Genomics of 1 million parent lifespans implicates novel pathways and common diseases and distinguishes survival chances. Elife. 2019 Jan 15;8:e39856. doi: 10.7554/eLife.39856. PMID: 30642433; PMCID: PMC6333444.
+- **Data**: downloaded from https://www.ebi.ac.uk/gwas/publications/30642433
+
+- **Outcome 3**: Coronary Artery Disease (CAD)
+- **Publication**: the CARDIoGRAMplusC4D Consortium. A comprehensive 1000 Genomes–based genome-wide association meta-analysis of coronary artery disease. Nat Genet 47, 1121–1130 (2015). https://doi.org/10.1038/ng.3396
+- **Data**: downloaded from https://cardiogramplusc4d.org/data-downloads/
 
 ## Relevant questions
 
