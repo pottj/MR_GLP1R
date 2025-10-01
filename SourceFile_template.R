@@ -25,7 +25,8 @@ library(tidyverse)    # Data wrangling
 library(TwoSampleMR)  # MR 
 library(gt)
 library(qqman)
-
+install.packages("data.table")
+library("data.table")
 #############################
 # path to data (root is the scripts folder)
 #############################

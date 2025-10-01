@@ -75,6 +75,38 @@ BMI_comb[rsID %in% topList$rsID]
 BMI_mal[rsID %in% topList$rsID]
 BMI_fem[rsID %in% topList$rsID]
 
+snp1<- subset(BMI_comb, rsID == "rs17757975")
+snp2<- subset(BMI_comb, rsID == "rs4714290")
+snp3<-subset(BMI_fem, rsID == "rs116208210")
+snp4<- subset(BMI_mal, rsID == "rs2254336")
+
+
+PCOS_1 <- subset(PCOS, rs_id == "rs17757975")
+PCOS_2 <- subset(PCOS, rs_id == "rs4714290")
+PCOS_3 <- subset(PCOS, rs_id == "rs116208210")
+PCOS_4 <- subset(PCOS, rs_id == "rs2254336")
+
+PCOS_1
+PCOS_2
+PCOS_3
+PCOS_4
+
+
+head(cad)
+names(cad)
+cad_1 <- subset(cad, rsid_ukb == "rs17757975")
+cad_2 <- subset(cad, rsid_ukb == "rs4714290")
+cad_3 <- subset(cad, rsid_ukb == "rs116208210")
+cad_4 <- subset(cad, rsid_ukb == "rs2254336")
+
+cad_1
+cad_2
+cad_3
+cad_4
+
+
+
+
 #' **Summary**:
 #' 
 #' - the two hits from the combined data are not genome-wide significant in the sex-stratified data sets, probably due to lower sample size = lower power; the effect sizes are similar

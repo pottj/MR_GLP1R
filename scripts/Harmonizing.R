@@ -35,10 +35,10 @@ Venkatesh_PCOS = "/Users/harshikamohanraj/Internship/GCST90483500.h.tsv"
 
 #' # Load data ####
 #' ***
-BMI_fem = fread("/Users/harshikamohanraj/Internship/bmi.giant-ukbb.meta-analysis.females.23May2018.txt")
-BMI_mal = fread("/Users/harshikamohanraj/Internship/bmi.giant-ukbb.meta-analysis.males.23May2018.txt")
-BMI_comb = fread("/Users/harshikamohanraj/Internship/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt")
-PCOS = fread("/Users/harshikamohanraj/Internship/PCOS_sumstats.tsv")
+BMI_fem = fread("/Users/harshikamohanraj/Desktop/Internship/bmi.giant-ukbb.meta-analysis.females.23May2018.txt")
+BMI_mal = fread("/Users/harshikamohanraj/Desktop/Internship/bmi.giant-ukbb.meta-analysis.males.23May2018.txt")
+BMI_comb = fread("/Users/harshikamohanraj/Desktop/Internship/bmi.giant-ukbb.meta-analysis.combined.23May2018.txt")
+PCOS = fread("/Users/harshikamohanraj/Desktop/Internship/PCOS_sumstats.tsv")
 
 #' # Filter data ####
 #' ***
@@ -48,6 +48,7 @@ PCOS = fread("/Users/harshikamohanraj/Internship/PCOS_sumstats.tsv")
 #' - chr6:39,048,781-39,091,303 (GRCh38/hg38)
 #' 
 names(BMI_fem)
+head(BMI_fem)
 BMI_fem = BMI_fem[CHR==6,]
 BMI_fem = BMI_fem[POS > 39016574 - 1e6,]
 BMI_fem = BMI_fem[POS < 39055519 + 1e6,]
@@ -146,11 +147,11 @@ BMI_fem = BMI_fem[!filt,]
 #' ***
 #' Save the harmonized data 
 #' 
-save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Internship/Input_harmonized.RData")
+save(BMI_comb,BMI_fem,BMI_mal,PCOS,file = "/Users/harshikamohanraj/Desktop/Internship/Input_harmonized.RData")
 
 
 ##Positive controls harmonising - ALL-CAUSE MORTALITY 
-all_cause = fread("/Users/harshikamohanraj/Internship/lifegen_phase2_bothpl_alldr_2017_09_18.tsv")
+all_cause = fread("/Users/harshikamohanraj/Desktop/Internship/lifegen_phase2_bothpl_alldr_2017_09_18.tsv")
 
 all_cause = all_cause[chr==6,]
 all_cause = all_cause[pos > 39016574 - 1e6,]
@@ -190,7 +191,7 @@ all_cause = all_cause[!filt,]
 
 
 ##Positive controls harmonising - CAD 
-cad = fread("/Users/harshikamohanraj/Internship/CAD_GWAS_SEX_STRATIFIED.txt.gz")
+cad = fread("/Users/harshikamohanraj/Desktop/Internship/CAD_GWAS_SEX_STRATIFIED.txt.gz")
 
 head(cad)
 head(all_cause)
@@ -233,8 +234,8 @@ BMI_fem = BMI_fem[!filt,]
 BMI_mal = BMI_mal[!filt,]
 
 ## OUTCOME 2 = HbA1c 
-hb = fread("/Users/harshikamohanraj/Internship/30750_raw.gwas.imputed_v3.both_sexes.varorder.tsv.bgz")
-PCOS = fread("/Users/harshikamohanraj/Internship/PCOS_sumstats.tsv")
+hb = fread("/Users/harshikamohanraj/Desktop/Internship/30750_raw.gwas.imputed_v3.both_sexes.varorder.tsv.bgz")
+PCOS = fread("/Users/harshikamohanraj/Desktop/Internship/PCOS_sumstats.tsv")
 
 #' # Filter data ####
 #' ***
@@ -267,7 +268,8 @@ hb = hb[minor_AF >=0.01 & minor_AF <=0.99,]
 PCOS = PCOS[effect_allele_frequency >=0.01 & effect_allele_frequency <=0.99,]
 
 #' Check overlap of rsID
-hb[,rsID := gsub(":.*","",SNP)]
+head(hb)
+hb[,rsID := gsub(":.*","",snp)]
 PCOS = PCOS[rs_id %in% hb$rsID]
 hb = hb[rsID %in% PCOS$rs_id, ]
 

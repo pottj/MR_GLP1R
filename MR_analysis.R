@@ -85,7 +85,7 @@ mr_obj_mal = mr_input(bx = as.numeric(BMI_mal$BETA[filt_mal]),
 mr_allmethods(mr_obj_mal)
 mr_plot(mr_obj_mal)
 mr_loo(mr_obj_mal)
-mr_forest(mr_obj_mal, ordered=TRUE)   
+mr_forest(mr_obj_mal, ordered=TRUE)  
 
 #BMI combined (exposure) vs PCOS (outcome)
 filt_com = BMI_comb$rsID %in% c("rs17757975", "rs4714290")
