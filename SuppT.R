@@ -23,8 +23,8 @@ head(select(cad_3, rs_number, BP, reference_allele, other_allele , eaf, beta, se
 head(select(cad_4, rs_number, BP, reference_allele, other_allele , eaf, beta, se, p_value))
 
 
-tab5 <- as.table(rbind(c("6", "38214150", "T", "C","0.859674","0.005345","0.009322","0.566436"), c("6", "40003502","T","C","0.707305", "0.003027", "0.007056", "0.667966"), c("6", "39920827", "T", "C", "0.986937", "-0.02457","0.03115","0.43025"), c("6","39032835","A","T","0.480492","0.010777","0.006491","0.09689")))
-dimnames(tab5) <-list(exposure = c("cad_1", "cad_2", "cad_3", "cad_4"),  summary_statistic = c("rs_number", "BP", "EA", "OA", "eaf", "beta", "se", "p_value"))
+tab5 <- as.table(rbind(c("6", "38214150", "T", "C","0.859674","0.005345","0.009322","0.566436", "rs17757975"), c("6", "40003502","T","C","0.707305", "0.003027", "0.007056", "0.667966", "rs4714290"), c("6", "39920827", "T", "C", "0.986937", "-0.02457","0.03115","0.43025", "rs116208210"), c("6","39032835","A","T","0.480492","0.010777","0.006491","0.09689", "rs2254336")))
+dimnames(tab5) <-list(exposure = c("cad_1", "cad_2", "cad_3", "cad_4"),  summary_statistic = c("chr", "BP", "EA", "OA", "eaf", "beta", "se", "p_value", "rs_id"))
 tab5
 
 
