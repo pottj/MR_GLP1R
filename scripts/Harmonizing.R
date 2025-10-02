@@ -249,8 +249,8 @@ a2 = var[seq(4,length(var),4)]
 
 hb[,chr := as.numeric(chr)]
 hb[,pos := as.numeric(pos)]
-hb[,a1 := as.numeric(a1)]
-hb[,a2 := as.numeric(a2)]
+hb[,a1 := as.character(a1)]
+hb[,a2 := as.character(a2)]
 head(hb)
 
 hb = hb[chr== "6",]
@@ -267,8 +267,11 @@ PCOS = PCOS[base_pair_location < 39055519 + 1e6,]
 hb = hb[minor_AF >=0.01 & minor_AF <=0.99,]
 PCOS = PCOS[effect_allele_frequency >=0.01 & effect_allele_frequency <=0.99,]
 
-#' Check overlap of rsID
+#' format the information with rs ids and snps
 head(hb)
+
+
+#' Check overlap of rsID
 hb[,rsID := gsub(":.*","",snp)]
 PCOS = PCOS[rs_id %in% hb$rsID]
 hb = hb[rsID %in% PCOS$rs_id, ]
