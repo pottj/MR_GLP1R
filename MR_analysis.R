@@ -66,7 +66,7 @@ mr_obj_fem = mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),
                       byse = as.numeric(PCOS$standard_error[filt_PCOS]),
                       )
        
-mr_ivw(mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),bxse = as.numeric(BMI_fem$SE[filt_fem]),by = as.numeric(PCOS$beta[filt_PCOS]), byse = as.numeric(PCOS$standard_error[filt_PCOS]))
+
 mr_allmethods(mr_obj_fem)
 mr_plot(mr_obj_fem)
 mr_loo(mr_obj_fem)
@@ -87,20 +87,6 @@ mr_plot(mr_obj_mal)
 mr_loo(mr_obj_mal)
 mr_forest(mr_obj_mal, ordered=TRUE)  
 
-#BMI combined (exposure) vs PCOS (outcome)
-filt_com = BMI_comb$rsID %in% c("rs17757975", "rs4714290")
-filt_PCOS = PCOS$rs_id %in% c("rs17757975","rs4714290")
-mr_obj_comb = mr_input(bx = as.numeric(BMI_comb$BETA[filt_com]),
-                      bxse = as.numeric(BMI_comb$SE[filt_com]),
-                      by = as.numeric(PCOS$beta[filt_PCOS]),
-                      byse = as.numeric(PCOS$standard_error[filt_PCOS]),
-                      )
-
-#mr_ivw(mr_obj_comb)
-mr_allmethods(mr_obj_comb)
-mr_plot(mr_obj_comb)
-mr_loo(mr_obj_comb)
-mr_forest(mr_obj_comb, ordered=TRUE)   
 
 ##Positive control = all-cause-mortality 
 #filtering
@@ -140,22 +126,6 @@ mr_plot(mr_obj_mala)
 mr_loo(mr_obj_mala )
 mr_forest(v, ordered=TRUE)   
 
-#BMI combined (exposure) vs all_cause (outcome)
-mr_obj_comba = mr_input(bx = as.numeric(BMI_comb$BETA[filt_com]),
-                       bxse = as.numeric(BMI_comb$SE[filt_com]),
-                       by = as.numeric(all_cause$beta1[filt_allc]),
-                       byse = as.numeric(all_cause$se[filt_allc]),
-)
-
-mr_ivw(mr_input(bx = as.numeric(BMI_comb$BETA[filt_com]),
-                bxse = as.numeric(BMI_comb$SE[filt_com]),
-                by = as.numeric(all_cause$beta1[filt_allc]),
-                byse = as.numeric(all_cause$se[filt_allc]),
-))
-mr_allmethods(mr_obj_comba)
-mr_plot(mr_obj_comba)
-mr_loo(mr_obj_comba)
-mr_forest(mr_obj_comba, ordered=TRUE)   
 
 ##Positive control = CAD
 #filtering
@@ -181,7 +151,7 @@ head(cad)
 #HbA1c  (exposure) vs PCOS (outcome)
 filt_hb = hb$rsID %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
 filt_PCOS = PCOS$rs_id %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
-mr_obj_hb = mr_input(bx = as.numeric(filt_hb$BETA[filt_hb]),
+mr_obj_hb = mr_input(bx = as.numeric(filt_hb$beta[filt_hb]),
                       bxse = as.numeric(filt_hb$SE[filt_hb]),
                       by = as.numeric(PCOS$beta[filt_PCOS]),
                       byse = as.numeric(PCOS$standard_error[filt_PCOS]),
