@@ -67,7 +67,7 @@ mr_obj_fem = mr_input(bx = as.numeric(BMI_fem$BETA[filt_fem]),
                       )
        
 
-mr_allmethods(mr_obj_fem)
+#mr_allmethods(mr_obj_fem)
 mr_plot(mr_obj_fem)
 mr_loo(mr_obj_fem)
 mr_forest(mr_obj_fem, ordered=TRUE)
@@ -149,14 +149,17 @@ head(cad)
 
 ### HbA1c
 #HbA1c  (exposure) vs PCOS (outcome)
-filt_hb = hb$rsID %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
-filt_PCOS = PCOS$rs_id %in% c("rs10305518","rs6923761","rs10305420", "rs140226575")
-mr_obj_hb = mr_input(bx = as.numeric(filt_hb$beta[filt_hb]),
-                      bxse = as.numeric(filt_hb$SE[filt_hb]),
-                      by = as.numeric(PCOS$beta[filt_PCOS]),
-                      byse = as.numeric(PCOS$standard_error[filt_PCOS]),
+#sanity check that the rs_ids --> using stop if not - filter 
+filt_hb = hb$rs_id %in% c("rs10305518","rs6923761","rs10305420", "rs140226575", "rs12214482")
+filt_PCOS2 = PCOS2$rs_id %in% c("rs10305518","rs6923761","rs10305420", "rs140226575", "rs12214482")
+mr_obj_hb = mr_input(bx = as.numeric(hb$beta[filt_hb]),
+                      bxse = as.numeric(hb$se[filt_hb]),
+                      by = as.numeric(PCOS2$beta[filt_PCOS2]),
+                      byse = as.numeric(PCOS2$standard_error[filt_PCOS2]),
 )
 
+hb[filt_hb, rs_id]
+head(hb)
 mr_ivw(mr_obj_hb)
 mr_allmethods(mr_obj_hb)
 mr_plot(mr_obj_hb)

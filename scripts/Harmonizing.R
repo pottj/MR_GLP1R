@@ -235,7 +235,7 @@ BMI_mal = BMI_mal[!filt,]
 
 ## OUTCOME 2 = HbA1c 
 hb = fread("/Users/harshikamohanraj/Desktop/Internship/30750_raw.gwas.imputed_v3.both_sexes.varorder.tsv.bgz")
-PCOS = fread("/Users/harshikamohanraj/Desktop/Internship/PCOS_sumstats.tsv")
+PCOS2 = fread("/Users/harshikamohanraj/Desktop/Internship/PCOS_sumstats.tsv")
 
 #' # Filter data ####
 #' ***
@@ -245,7 +245,7 @@ var = unlist(strsplit(hb$variant,":"))
 chr = var[seq(1,length(var),4)]
 pos = var[seq(2,length(var),4)]
 a1 = var[seq(3,length(var),4)]
-a2 = var[seq(4,length(var),4)]
+a2 = var[seq(4,length(var),4)] #effect
 
 hb[,chr := as.numeric(chr)]
 hb[,pos := as.numeric(pos)]
@@ -253,32 +253,36 @@ hb[,a1 := as.character(a1)]
 hb[,a2 := as.character(a2)]
 head(hb)
 
+#Hb minor --> major (effect) freq conversion 
+hb[minor_allele==a2,eaf := minor_AF]
+hb[minor_allele!=a2,eaf := 1-minor_AF] 
+
 #' format the information with rs ids and snps
 head(hb)
-matched = match(BMI$POS, hb$pos)
+matched = match(BMI_comb$POS, hb$pos)
 hb = hb[matched,]
-hb$rs_id<- BMI$rsID
+hb$rs_id<- BMI_comb$rsID
 
 hb = hb[chr== "6",]
 hb = hb[pos > 39016574 - 1e6,]
 hb = hb[pos < 39055519 + 1e6,]
 
-PCOS = PCOS[chromosome==6,]
-PCOS = PCOS[base_pair_location > 39016574 - 1e6,]
-PCOS = PCOS[base_pair_location < 39055519 + 1e6,]
+PCOS2 = PCOS2[chromosome==6,]
+PCOS2 = PCOS2[base_pair_location > 39016574 - 1e6,]
+PCOS2 = PCOS2[base_pair_location < 39055519 + 1e6,]
 
 #' Remove variants with very low frequency
-hb = hb[minor_AF >=0.01 & minor_AF <=0.99,]
-PCOS = PCOS[effect_allele_frequency >=0.01 & effect_allele_frequency <=0.99,]
+hb = hb[eaf >=0.01 & eaf <=0.99,]
+PCOS2 = PCOS2[effect_allele_frequency >=0.01 & effect_allele_frequency <=0.99,]
 
 
 #' Check overlap of rsID
 #hb[,rs_id := gsub(":.*","",variant)]
-PCOS = PCOS[rs_id %in% hb$rs_id]
-hb = hb[rs_id %in% PCOS$rs_id, ]
+PCOS2 = PCOS2[rs_id %in% hb$rs_id]
+hb = hb[rs_id %in% PCOS2$rs_id, ]
 
 head(hb) 
-head(PCOS)
+head(PCOS2)
 
 # Check duplicates & triallelic SNPs
 hb[duplicated(variant),]
@@ -286,31 +290,31 @@ hb[duplicated(rs_id),]
 hb[duplicated(pos),]
 
 #' Check order of data sets
-setorder(PCOS,base_pair_location) #Alternative: match command - using id variable to order the other datasets 
+setorder(PCOS2,base_pair_location) #Alternative: match command - using id variable to order the other datasets 
 stopifnot(hb$rsID == hb$rs_id)
 
 #' # Harmonize alleles ####
 #' ***
 #EA and OA -> renaming the columns 
-plot(hb$minor_AF, PCOS$effect_allele_frequency)
+plot(hb$eaf, PCOS2$effect_allele_frequency)
 
 #' In the PCOS data, there are 3,383 SNPs with same allele coding as the BMI data, and 2,742 SNPs with switch alleles. These SNPs will be flipped back to the BMI coding. 
 #' 
-filt = hb$a1 == PCOS$other_allele & 
-  hb$a2 == PCOS$effect_allele
+filt = hb$a2 == PCOS2$other_allele & 
+  hb$a1 == PCOS2$effect_allele
 table(filt)
-PCOS[filt,beta := beta * (-1)]
-PCOS[filt,effect_allele_frequency := 1-effect_allele_frequency]
-PCOS[filt,effect_allele := hb[filt,a2]]
-PCOS[filt,other_allele := hb[filt,a1]]
+PCOS2[filt,beta := beta * (-1)]
+PCOS2[filt,effect_allele_frequency := 1-effect_allele_frequency]
+PCOS2[filt,effect_allele := hb[filt,a1]]
+PCOS2[filt,other_allele := hb[filt,a2]]
 
 #' Now check the transformation with the EAF plot again. 
-plot(hb$minor_AF, PCOS$effect_allele_frequency)
+plot(hb$eaf, PCOS2$effect_allele_frequency)
 
 #' Remove the outlier that have different allele frquencies. 
-filt = abs(hb$minor_AF - PCOS$effect_allele_frequency) >0.1
+filt = abs(hb$eaf - PCOS2$effect_allele_frequency) >0.1
 table(filt)
-PCOS = PCOS[!filt,]
+PCOS2 = PCOS2[!filt,]
 hb = hb[!filt,]
 
 
